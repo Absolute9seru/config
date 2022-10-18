@@ -1,0 +1,143 @@
+proxies:
+proxy-groups:
+  - name: Umum-Global
+    type: select
+    use:
+      - ID
+      - SG
+      - Other
+    proxies:
+      - ID-LB
+      - ID-Ping
+      - ID-Fallback
+      - SG-LB
+      - SG-Ping
+      - SG-Fallback
+      - Umum-LB
+      - Umum-Ping
+      - Umum-Fallback
+      - DIRECT
+      - REJECT     
+      
+  - name: Umum-LB
+    type: load-balance
+    strategy: consistent-hashing
+    url: http://hi.bonds.id/ping
+    interval: 300
+    use:
+      - ID
+      - SG     
+      
+  - name: Umum-Ping
+    type: url-test
+    url: http://hi.bonds.id/ping
+    interval: 300
+    tolerance: 50
+    use:
+      - ID
+      - SG      
+      
+  - name: Umum-Fallback
+    type: fallback
+    url: http://hi.bonds.id/ping
+    interval: 300
+    use:
+      - ID
+      - SG      
+      
+  - name: ID-LB
+    type: load-balance
+    strategy: consistent-hashing
+    url: http://hi.bonds.id/ping
+    interval: 300
+    use:
+      - ID      
+      
+  - name: ID-Ping
+    type: url-test
+    url: http://hi.bonds.id/ping
+    interval: 300
+    tolerance: 50
+    use:
+      - ID      
+      
+  - name: ID-Fallback
+    type: fallback
+    url: http://hi.bonds.id/ping
+    interval: 300
+    use:
+      - ID  
+      
+  - name: SG-LB
+    type: load-balance
+    strategy: consistent-hashing
+    url: http://hi.bonds.id/ping
+    interval: 300
+    use:
+      - SG      
+      
+  - name: SG-Ping
+    type: url-test
+    url: http://hi.bonds.id/ping
+    interval: 300
+    tolerance: 50
+    use:
+      - SG      
+      
+  - name: SG-Fallback
+    type: fallback
+    url: http://hi.bonds.id/ping
+    interval: 300
+    use:
+      - SG  
+      
+  - name: Opsi-Direct
+    type: select
+    proxies:
+      - DIRECT
+      - Umum-Ping
+    use:
+      - ID
+      - SG
+      - Other
+
+rule-providers:
+  Rule-Direct:
+    type: http
+    behavior: classical
+    path: "./Rule/Rule-Direct.yaml"
+    url: https://raw.githubusercontent.com/Absolute9seru/Openclash-Rule/main/Rule-Direct.yaml
+    
+proxy-providers:
+  ID:
+    type: file
+    path: ./Akun/ID.yaml
+    health-check:
+      enable: true
+      interval: 300
+      lazy: true
+      url: 'http://www.gstatic.com/generate_204'      
+  SG:
+    type: file
+    path: ./Akun/SG.yaml
+    health-check:
+      enable: true
+      interval: 300
+      lazy: true
+      url: 'http://www.gstatic.com/generate_204'      
+  Other:
+    type: file
+    path: ./Akun/Other.yaml
+    health-check:
+      enable: true
+      interval: 300
+      lazy: true
+      url: 'http://www.gstatic.com/generate_204'
+
+rules:
+  - RULE-SET,Rule-Direct,Opsi-Direct
+  - GEOSITE,instagram,ID-Ping
+  - GEOSITE,shopee,ID-Ping
+  - GEOSITE,telegram,SG-LB
+  - GEOSITE,youtube,SG-Ping
+  - MATCH,Umum-Global
