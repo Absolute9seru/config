@@ -1,0 +1,80 @@
+proxies:
+  - name: SG
+    server: 104.16.53.111
+    port: 443
+    type: trojan
+    password: f5c2a870-4f02-11ed-b3bc-1239d0255272
+    skip-cert-verify: true
+    sni: layanan.ruangguru.com
+    network: ws
+    ws-opts: 
+      path: wss://layanan.ruangguru.com/howdy
+      headers: 
+        Host: sg2-trojan.bonds.id
+    udp: true
+  - name: ID
+    server: 104.16.53.111
+    port: 443
+    type: trojan
+    password: 411cdae0-4f07-11ed-b696-1239d0255272
+    skip-cert-verify: true
+    sni: layanan.ruangguru.com
+    network: ws
+    ws-opts: 
+      path: wss://layanan.ruangguru.com/howdy
+      headers: 
+        Host: sg-atha.bonds.id
+    udp: true
+proxy-groups:
+  - name: Selected-Proxies
+    type: select
+    proxies:
+      - L-Balance
+      - F-Back 
+  - name: L-Balance
+    type: load-balance
+    strategy: sticky-sessions
+    url: 'http://www.gstatic.com/generate_204'
+    interval: 500 
+    proxies:
+      - ID
+      - SG 
+  - name: F-Back
+    type: fallback
+    url: 'http://www.gstatic.com/generate_204'
+    interval: 500 
+    proxies:
+      - ID
+      - SG 
+rules: 
+  # Rule-WA
+  - DOMAIN-SUFFIX,m.me,DIRECT
+  - DOMAIN-SUFFIX,oculus.com,DIRECT
+  - DOMAIN-SUFFIX,oculuscdn.com,DIRECT
+  - DOMAIN-SUFFIX,rocksdb.org,DIRECT
+  - DOMAIN-SUFFIX,whatsapp.com,DIRECT
+  - DOMAIN-SUFFIX,whatsapp.net,DIRECT
+  - DOMAIN-SUFFIX,g.whatsapp.net,DIRECT
+  - DOMAIN-SUFFIX,web.whatsapp.com,DIRECT
+  - DOMAIN-SUFFIX,scontent.whatsapp.net,DIRECT
+  - DOMAIN-SUFFIX,whatsapp.com,DIRECT
+  - DOMAIN-SUFFIX,static.whatsapp.net,DIRECT
+  - DOMAIN-SUFFIX,whatsapp.net,DIRECT
+  - DOMAIN-SUFFIX,mmg.whatsapp.net,DIRECT
+  - DOMAIN-SUFFIX,media.fbdj2-1.fna.whatsapp.net,DIRECT
+  - DOMAIN-SUFFIX,media-xsp1-2.cdn.whatsapp.net,DIRECT
+  - DST-PORT,3478,DIRECT
+  - DST-PORT,4244,DIRECT
+  - DST-PORT,5222,DIRECT
+  - DST-PORT,5223,DIRECT
+  - DST-PORT,5228,DIRECT
+  - DST-PORT,5288,DIRECT
+  - DST-PORT,5242,DIRECT
+  - DST-PORT,5349,DIRECT
+  - DST-PORT,34784,DIRECT
+  - DST-PORT,45395,DIRECT
+  - DST-PORT,50318,DIRECT
+  - DST-PORT,59234,DIRECT
+  - PROCESS-NAME,com.whatsapp,DIRECT
+  - GEOSITE,whatsapp,DIRECT
+  - MATCH,GLOBAL
